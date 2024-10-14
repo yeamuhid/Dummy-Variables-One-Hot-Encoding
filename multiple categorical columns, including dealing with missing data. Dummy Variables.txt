@@ -1,0 +1,17 @@
+import pandas as pd
+
+# Sample DataFrame with multiple categorical columns and missing values
+data = {
+    'Category1': ['A', 'B', 'A', 'C', None, 'B'],
+    'Category2': ['X', 'Y', 'X', 'Z', 'Y', None],
+    'Value': [10, 15, 10, 20, 15, 20]
+}
+df = pd.DataFrame(data)
+
+# Fill missing values in categorical columns before creating dummies
+df_filled = df.fillna('Missing')
+
+# Create dummy variables for both categorical columns
+dummy_df = pd.get_dummies(df_filled, columns=['Category1', 'Category2'], drop_first=False, prefix=['Cat1', 'Cat2'])
+
+print("Dummy Variables with Missing Values Handled:\n", dummy_df)

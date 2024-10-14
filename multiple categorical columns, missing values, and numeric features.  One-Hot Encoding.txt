@@ -1,0 +1,56 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestClassifier
+
+# Sample DataFrame with both categorical and numerical data
+data = {
+    'Category1': ['A', 'B', 'A', 'C', None, 'B'],
+    'Category2': ['X', 'Y', 'X', 'Z', 'Y', None],
+    'Value': [10, 15, 10, 20, 15, 20],
+    'Target': [1, 0, 1, 0, 1, 0]
+}
+df = pd.DataFrame(data)
+
+# Define features and target
+X = df[['Category1', 'Category2', 'Value']]
+y = df['Target']
+
+# Split data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Preprocessing for categorical features
+categorical_features = ['Category1', 'Category2']
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='constant', fill_value='Missing')),  # Handle missing values
+    ('onehot', OneHotEncoder(drop='first'))  # One-hot encode and drop the first to avoid multicollinearity
+])
+
+# Preprocessing for numeric features
+numeric_features = ['Value']
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='mean'))  # Handle missing values for numeric data
+])
+
+# Combine preprocessing steps
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numeric_transformer, numeric_features),
+        ('cat', categorical_transformer, categorical_features)
+    ])
+
+# Define a machine learning pipeline with preprocessing and a classifier
+model_pipeline = Pipeline(steps=[
+    ('preprocessor', preprocessor),
+    ('classifier', RandomForestClassifier())
+])
+
+# Train the model
+model_pipeline.fit(X_train, y_train)
+
+# Evaluate the model
+accuracy = model_pipeline.score(X_test, y_test)
+print(f"Model Accuracy: {accuracy:.2f}")

@@ -1,0 +1,15 @@
+from sklearn.preprocessing import OneHotEncoder
+import pandas as pd
+
+# Sample DataFrame
+df = pd.DataFrame({'Category': ['A', 'B', 'A', 'C', 'B', 'C']})
+
+# Initialize the OneHotEncoder
+encoder = OneHotEncoder(drop='first', sparse_output=False)  # drop='first' avoids multicollinearity
+
+# Fit and transform the data
+one_hot = encoder.fit_transform(df[['Category']])
+
+# Convert the result back to a DataFrame
+one_hot_df = pd.DataFrame(one_hot, columns=encoder.get_feature_names_out(['Category']))
+print("One-Hot Encoded Data:\n", one_hot_df)
